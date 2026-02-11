@@ -19,33 +19,21 @@ javac -version
 
 ## 2) Windows (NO make)
 
-Use only JDK tools (`javac` + `java`) from **Command Prompt** or **PowerShell**.
+Use the included launcher scripts from the project root:
 
-### A) CMD
+### A) Command Prompt (CMD)
 
 ```bat
-cd C:\path\to\parking-lot-management-system
-if not exist out mkdir out
-dir /s /b src\main\java\*.java > sources.txt
-javac -d out -cp "out;lib\sqlite-jdbc-3.46.0.0.jar;lib\slf4j-api-2.0.13.jar;lib\slf4j-simple-2.0.13.jar" @sources.txt
-java -cp "out;lib\sqlite-jdbc-3.46.0.0.jar;lib\slf4j-api-2.0.13.jar;lib\slf4j-simple-2.0.13.jar" app.Main
-del sources.txt
+run.cmd
 ```
 
 ### B) PowerShell
 
 ```powershell
-cd C:\path\to\parking-lot-management-system
-if (!(Test-Path out)) { New-Item -ItemType Directory out | Out-Null }
-Get-ChildItem -Recurse -Path src/main/java -Filter *.java |
-  Select-Object -ExpandProperty FullName |
-  Set-Content sources.txt
-javac -d out -cp "out;lib/sqlite-jdbc-3.46.0.0.jar;lib/slf4j-api-2.0.13.jar;lib/slf4j-simple-2.0.13.jar" @sources.txt
-java -cp "out;lib/sqlite-jdbc-3.46.0.0.jar;lib/slf4j-api-2.0.13.jar;lib/slf4j-simple-2.0.13.jar" app.Main
-Remove-Item sources.txt
+./run.ps1
 ```
 
-> Main class: `app.Main` (from `src/main/java/app/Main.java`).
+Both scripts compile and run `app.Main`, and they normalize source paths to avoid the `javac @sources.txt` backslash escaping issue on Windows absolute paths.
 
 ## 3) Linux/macOS (make allowed)
 
