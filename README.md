@@ -30,6 +30,16 @@ curl -L -o lib/slf4j-simple-2.0.13.jar https://repo1.maven.org/maven2/org/slf4j/
 javac Main.java
 ```
 
+### Optional: Build/Run with Make
+
+```bash
+make compile
+make run
+```
+
+- `make compile` compiles with `javac Main.java`.
+- `make run` ensures runtime jars exist in `lib/` and then launches the app.
+
 ### 4) Run
 
 #### Linux/macOS
