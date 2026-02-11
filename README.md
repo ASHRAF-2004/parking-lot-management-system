@@ -4,78 +4,95 @@ A Java Swing desktop application for managing a multi-floor parking lot with SQL
 
 ## Offline-First Setup (No Maven Required)
 
-This repository is now self-contained for offline usage:
+This repository is self-contained for offline usage:
 
 - All required third-party JARs are vendored in `lib/`.
 - No runtime download is performed.
-- No Makefile step downloads anything.
+- `make` targets run fully offline.
 
 ## Prerequisites
 
 - Java 17+ (JDK, not just JRE)
+- `make` and a POSIX shell (Linux/macOS native, Git Bash/MSYS2 on Windows)
 
 ## Included Local Dependencies
-
-The following files are committed in `lib/`:
 
 - `lib/sqlite-jdbc-3.46.0.0.jar`
 - `lib/slf4j-api-2.0.13.jar`
 - `lib/slf4j-simple-2.0.13.jar`
 
-## Build and Run (Fully Offline)
+## Build and Run (Recommended)
 
-### Compile
-```bash
-make compile
-```
-
-### Run
+### macOS/Linux
 
 ```bash
+make clean
 make run
 ```
 
-`make run` validates local JARs, compiles sources, and launches the app.
-
-## Manual Run Commands (Offline)
-
-### Compile
+### Windows (Git Bash / MSYS2)
 
 ```bash
-javac Main.java
+make clean
+make run
 ```
 
-### Run (Linux/macOS)
+## Smoke Checks
+
+Runs minimal end-to-end checks for:
+
+- DB init
+- Main startup flow / frame construction safety
+- One entry/exit payment cycle
+
+### macOS/Linux
 
 ```bash
-java -cp ".:lib/sqlite-jdbc-3.46.0.0.jar:lib/slf4j-api-2.0.13.jar:lib/slf4j-simple-2.0.13.jar" Main
+make smoke
 ```
 
-### Run (Windows)
+### Windows (Git Bash / MSYS2)
 
-```bat
-java -cp ".;lib/sqlite-jdbc-3.46.0.0.jar;lib/slf4j-api-2.0.13.jar;lib/slf4j-simple-2.0.13.jar" Main
+```bash
+make smoke
 ```
 
----
+## Direct `javac` / `java` Commands (Without `make`)
 
-## Project Structure for Plain `javac`
+If you cannot use `make`, compile sources under `src/` and run `app.Main`.
+
+### macOS/Linux
+
+```bash
+mkdir -p bin
+javac -d bin -cp "bin:lib/sqlite-jdbc-3.46.0.0.jar:lib/slf4j-api-2.0.13.jar:lib/slf4j-simple-2.0.13.jar" $(find src -type f -name '*.java')
+java -cp "bin:lib/sqlite-jdbc-3.46.0.0.jar:lib/slf4j-api-2.0.13.jar:lib/slf4j-simple-2.0.13.jar" app.Main
+```
+
+### Windows (PowerShell)
+
+```powershell
+New-Item -ItemType Directory -Force -Path bin | Out-Null
+$files = Get-ChildItem -Recurse -Path src -Filter *.java | ForEach-Object { $_.FullName }
+javac -d bin -cp "bin;lib/sqlite-jdbc-3.46.0.0.jar;lib/slf4j-api-2.0.13.jar;lib/slf4j-simple-2.0.13.jar" $files
+java -cp "bin;lib/sqlite-jdbc-3.46.0.0.jar;lib/slf4j-api-2.0.13.jar;lib/slf4j-simple-2.0.13.jar" app.Main
+```
+
+## Project Structure
 
 ```text
 .
-├── Main.java                # default-package launcher entry point
-├── app/                     # app.Main and startup flow
-├── model/                   # domain objects, enums, DTOs
-├── repository/              # SQLite access and repositories
-├── service/                 # business logic (entry/exit/fine/report)
-├── ui/                      # Swing UI (Admin, Entry/Exit, Reports)
-├── util/                    # formatting/time/id helpers
-├── lib/                     # vendored third-party JAR dependencies
-└── src/main/java/...        # original Maven-style source tree (kept for reference)
+├── src/
+│   ├── main/java/           # Application source (app, model, repository, service, ui, util)
+│   └── test/java/           # Smoke checks
+├── lib/                     # Vendored third-party JAR dependencies
+├── Makefile
+├── pom.xml
+└── README.md
 ```
 
 ## Notes
 
 - Database file `parking.db` is created automatically in the project root at first run.
-- Spot seeding occurs once when the parking spots table is empty.
-- Maven file is kept for compatibility, but the recommended offline workflow is `make`/`javac` from this repository.
+- Spot seeding occurs once when `parking_spots` is empty.
+- In headless environments, UI launch is skipped by `app.Main`.

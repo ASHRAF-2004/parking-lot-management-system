@@ -17,16 +17,12 @@ endif
 
 JAVA_FILES := $(shell find $(SRC_DIR) -type f -name '*.java')
 
-MAIN_CLASS ?= $(shell \
-	if [ -f $(SRC_DIR)/main/java/app/Main.java ]; then \
-		echo app.Main; \
-	else \
-		rg -l 'public[[:space:]]+static[[:space:]]+void[[:space:]]+main' $(SRC_DIR) --glob '*.java' | head -n 1 | sed -e 's#^$(SRC_DIR)/main/java/##' -e 's#^$(SRC_DIR)/##' -e 's#/#.#g' -e 's#\.java$$##'; \
-	fi)
+MAIN_CLASS ?= app.Main
+SMOKE_CLASS ?= smoke.SmokeChecks
 
 COMPILE_CP := $(BIN_DIR)$(CP_SEP)$(SQLITE_JAR)$(CP_SEP)$(SLF4J_API_JAR)$(CP_SEP)$(SLF4J_SIMPLE_JAR)
 
-.PHONY: all compile run clean deps
+.PHONY: all compile run smoke clean deps
 
 all: compile
 
@@ -42,8 +38,10 @@ deps:
 	@test -f $(SLF4J_SIMPLE_JAR) || (echo "Missing local dependency: $(SLF4J_SIMPLE_JAR)"; exit 1)
 
 run: deps compile
-	@if [ -z "$(MAIN_CLASS)" ]; then echo "Could not detect a Main class."; exit 1; fi
 	$(JAVA) -cp "$(COMPILE_CP)" $(MAIN_CLASS)
+
+smoke: deps compile
+	$(JAVA) -cp "$(COMPILE_CP)" $(SMOKE_CLASS)
 
 clean:
 	rm -rf $(BIN_DIR)
