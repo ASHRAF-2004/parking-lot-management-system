@@ -5,7 +5,9 @@ import model.enums.SpotStatus;
 import model.enums.SpotType;
 import repository.Database;
 import repository.ParkingSpotRepository;
+import ui.MainFrame;
 
+import javax.swing.SwingUtilities;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,5 +60,7 @@ public class Main {
 
         System.out.println("DB ready");
         System.out.println("Total spots seeded: " + seededCount);
+        
+        SwingUtilities.invokeLater(() -> new MainFrame(database).setVisible(true));
     }
 }
