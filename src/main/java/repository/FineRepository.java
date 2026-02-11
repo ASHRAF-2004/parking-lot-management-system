@@ -72,7 +72,29 @@ public class FineRepository {
         }
     }
 
-    
+    public boolean existsUnpaidFine(String plate, FineReason reason, String createdDatePrefix) {
+        String sql = """
+                SELECT EXISTS(
+                    SELECT 1 FROM fines
+                    WHERE plate = ?
+                      AND reason = ?
+                      AND status = ?
+                      AND created_at LIKE ?
+                )
+                """;
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, plate);
+            statement.setString(2, reason.name());
+            statement.setString(3, FineStatus.UNPAID.name());
+            statement.setString(4, createdDatePrefix + "%");
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() && resultSet.getInt(1) == 1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to check existing unpaid fine.", e);
+        }
+    }
 
     public List<FineRecord> findAllUnpaid() {
         String sql = "SELECT * FROM fines WHERE status = ? ORDER BY created_at";

@@ -12,11 +12,13 @@ import repository.ActiveParkingRepository;
 import repository.Database;
 import repository.ParkingHistoryRepository;
 import repository.ParkingSpotRepository;
+import repository.FineRepository;
 import service.rules.DurationCalculator;
 import service.rules.RateCalculator;
 import util.MoneyUtil;
 import util.TimeUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,7 @@ public class ExitService {
     private final ActiveParkingRepository activeParkingRepository;
     private final ParkingSpotRepository parkingSpotRepository;
     private final FineService fineService;
+	private final FineRepository fineRepository;
     private final ParkingHistoryRepository parkingHistoryRepository;
     private final Map<String, ExitBill> billCache = new HashMap<>();
 
@@ -32,6 +35,7 @@ public class ExitService {
         this.activeParkingRepository = new ActiveParkingRepository(database);
         this.parkingSpotRepository = new ParkingSpotRepository(database);
         this.fineService = new FineService(database);
+		this.fineRepository = new FineRepository(database);
         this.parkingHistoryRepository = new ParkingHistoryRepository(database);
     }
 
@@ -56,17 +60,20 @@ public class ExitService {
 
         double unpaidBefore = MoneyUtil.round2(fineService.getUnpaidAmount(active.getPlate()));
         double newFine = 0.0;
-
+		
+		String createdDatePrefix = LocalDate.now().toString();
         if (hours > 24) {
             FineSchemeType scheme = fineService.getCurrentScheme();
             double overstayFine = MoneyUtil.round2(fineService.computeOverstayFine(hours));
-            if (overstayFine > 0) {
+            if (overstayFine > 0 && !fineRepository.existsUnpaidFine(active.getPlate(), FineReason.OVERSTAY, createdDatePrefix)) {
                 fineService.createFine(active.getPlate(), FineReason.OVERSTAY, overstayFine, scheme);
                 newFine += overstayFine;
             }
         }
 
-        if (spot.getType() == model.enums.SpotType.RESERVED && !active.isHasVipReservation()) {
+        if (spot.getType() == model.enums.SpotType.RESERVED
+                && !active.isHasVipReservation()
+                && !fineRepository.existsUnpaidFine(active.getPlate(), FineReason.RESERVED_MISUSE, createdDatePrefix)) {
             fineService.createFine(active.getPlate(), FineReason.RESERVED_MISUSE, 100.0, fineService.getCurrentScheme());
             newFine += 100.0;
         }
