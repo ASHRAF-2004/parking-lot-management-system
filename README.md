@@ -25,7 +25,7 @@ Use the included batch launcher from the project root:
 run.bat
 ```
 
-The script compiles and runs `app.Main`, and it normalizes source paths to avoid the `javac @sources.txt` backslash escaping issue on Windows absolute paths.
+The script validates Java/JDK availability, checks required JARs, compiles sources, and runs `app.Main`.
 
 ## 3) Linux/macOS (make allowed)
 
@@ -47,6 +47,11 @@ make run
 - Re-open terminal and re-check:
   - `java -version`
   - `javac -version`
+
+### App prints `Headless environment detected. UI launch skipped.`
+
+- This is expected when running on a server/terminal with no graphical desktop.
+- On Windows desktop, this usually means Java was launched in a headless session (for example via remote CI shell).
 
 ### `ClassNotFoundException`
 
