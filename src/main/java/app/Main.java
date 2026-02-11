@@ -8,6 +8,7 @@ import repository.ParkingSpotRepository;
 import ui.MainFrame;
 
 import javax.swing.SwingUtilities;
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,16 @@ public class Main {
 
         System.out.println("DB ready");
         System.out.println("Total spots seeded: " + seededCount);
-        
+
+        boolean displayUnavailable = !System.getProperty("os.name", "").toLowerCase().contains("win")
+                && System.getenv("DISPLAY") == null
+                && System.getenv("WAYLAND_DISPLAY") == null;
+
+        if (GraphicsEnvironment.isHeadless() || displayUnavailable) {
+            System.out.println("Headless environment detected. UI launch skipped.");
+            return;
+        }
+
         SwingUtilities.invokeLater(() -> new MainFrame(database).setVisible(true));
     }
 }
