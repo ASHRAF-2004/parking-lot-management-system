@@ -37,9 +37,9 @@ compile:
 
 deps:
 	@mkdir -p $(LIB_DIR)
-	@test -f $(SQLITE_JAR) || curl --fail --location --output $(SQLITE_JAR) https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.46.0.0/sqlite-jdbc-3.46.0.0.jar
-	@test -f $(SLF4J_API_JAR) || curl --fail --location --output $(SLF4J_API_JAR) https://repo1.maven.org/maven2/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar
-	@test -f $(SLF4J_SIMPLE_JAR) || curl --fail --location --output $(SLF4J_SIMPLE_JAR) https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/2.0.13/slf4j-simple-2.0.13.jar
+	@test -f $(SQLITE_JAR) || (echo "Missing local dependency: $(SQLITE_JAR)"; exit 1)
+	@test -f $(SLF4J_API_JAR) || (echo "Missing local dependency: $(SLF4J_API_JAR)"; exit 1)
+	@test -f $(SLF4J_SIMPLE_JAR) || (echo "Missing local dependency: $(SLF4J_SIMPLE_JAR)"; exit 1)
 
 run: deps compile
 	@if [ -z "$(MAIN_CLASS)" ]; then echo "Could not detect a Main class."; exit 1; fi
