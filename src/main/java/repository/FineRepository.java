@@ -72,6 +72,25 @@ public class FineRepository {
         }
     }
 
+    
+
+    public List<FineRecord> findAllUnpaid() {
+        String sql = "SELECT * FROM fines WHERE status = ? ORDER BY created_at";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, FineStatus.UNPAID.name());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<FineRecord> fines = new ArrayList<>();
+                while (resultSet.next()) {
+                    fines.add(map(resultSet));
+                }
+                return fines;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch all unpaid fines.", e);
+        }
+    }
+
     public void markAllPaidForPlate(String plate, String paidAtIso) {
         String sql = "UPDATE fines SET status = ?, paid_at = ? WHERE plate = ? AND status = ?";
         try (Connection connection = database.getConnection();
