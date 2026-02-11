@@ -19,21 +19,13 @@ javac -version
 
 ## 2) Windows (NO make)
 
-Use the included launcher scripts from the project root:
-
-### A) Command Prompt (CMD)
+Use the included batch launcher from the project root:
 
 ```bat
-run.cmd
+run.bat
 ```
 
-### B) PowerShell
-
-```powershell
-./run.ps1
-```
-
-Both scripts compile and run `app.Main`, and they normalize source paths to avoid the `javac @sources.txt` backslash escaping issue on Windows absolute paths.
+The script compiles and runs `app.Main`, and it normalizes source paths to avoid the `javac @sources.txt` backslash escaping issue on Windows absolute paths.
 
 ## 3) Linux/macOS (make allowed)
 
@@ -79,6 +71,7 @@ make run
 ├── lib/                     # Vendored third-party JAR dependencies
 ├── Makefile
 ├── pom.xml
+├── run.bat
 └── README.md
 ```
 
