@@ -3,19 +3,20 @@ package service.fines;
 public class ProgressiveFineScheme implements FineScheme {
     @Override
     public double compute(int billableHours) {
-        // Malaysian progressive fines (more realistic)
-        if (billableHours <= 12) {
-            return 0.0;           // Within normal parking time
-        }
         if (billableHours <= 24) {
-            return 30.0;          // First day overstay
+            return 0.0;
         }
-        if (billableHours <= 48) {
-            return 80.0;          // Second day (clamping equivalent)
+
+        double fine = 50.0;
+        if (billableHours > 24) {
+            fine += 100.0;
         }
-        if (billableHours <= 72) {
-            return 150.0;         // Third day
+        if (billableHours > 48) {
+            fine += 150.0;
         }
-        return 250.0;             // Extended overstay (towing equivalent)
+        if (billableHours > 72) {
+            fine += 200.0;
+        }
+        return fine;
     }
 }

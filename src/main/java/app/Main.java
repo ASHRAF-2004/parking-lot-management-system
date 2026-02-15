@@ -29,16 +29,16 @@ public class Main {
                         double rate;
                         if (spot <= 3) {
                             type = SpotType.COMPACT;
-                            rate = 1.0;  // RM1/hour - Motorcycle/compact spaces
+                            rate = 2.0;
                         } else if (spot <= 8) {
                             type = SpotType.REGULAR;
-                            rate = 3.0;  // RM3/hour - Standard Malaysian mall rate
+                            rate = 5.0;
                         } else if (spot == 9) {
                             type = SpotType.HANDICAPPED;
-                            rate = 0.0;  // FREE for OKU (Malaysian standard)
+                            rate = 2.0;
                         } else {
                             type = SpotType.RESERVED;
-                            rate = 4.0;  // RM4/hour - Season/reserved parking
+                            rate = 10.0;
                         }
 
                         String spotId = String.format("F%d-R%d-S%d", floor, row, spot);

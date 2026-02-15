@@ -181,9 +181,9 @@ parking-lot-management-system-main/
 
 - **Multi-floor parking management**: 5 floors, 3 rows per floor, 10 spots per row (150 total spots)
 - **Vehicle types**: Motorcycle, Car, SUV/Truck, Handicapped
-- **Spot types**: Compact, Regular, Large, Handicapped (with different hourly rates)
+- **Spot types**: Compact, Regular, Handicapped, Reserved (with different hourly rates)
 - **Entry/Exit management**: Ticket generation, parking duration calculation
-- **Payment processing**: Multiple payment methods
+- **Payment processing**: Cash and card
 - **Fine schemes**: Fixed, Hourly, Progressive
 - **Reports**: Occupancy, revenue, active parking, fines
 - **SQLite persistence**: All data stored locally in `parking.db`

@@ -57,16 +57,12 @@ public class ExitService {
                 spot.getRate()
         );
         double parkingFee = MoneyUtil.round2(hours * hourlyRate);
-        
-        // Apply Malaysian daily cap (max RM20 per day)
-        parkingFee = MoneyUtil.round2(RateCalculator.applyDailyCap(parkingFee, hours));
 
         double unpaidBefore = MoneyUtil.round2(fineService.getUnpaidAmount(active.getPlate()));
         double newFine = 0.0;
 		
 		String createdDatePrefix = LocalDate.now().toString();
-        // Malaysian standard: Overstay fine beyond 12 hours (not 24)
-        if (hours > 12) {
+        if (hours > 24) {
             FineSchemeType scheme = fineService.getCurrentScheme();
             double overstayFine = MoneyUtil.round2(fineService.computeOverstayFine(hours));
             if (overstayFine > 0 && !fineRepository.existsUnpaidFine(active.getPlate(), FineReason.OVERSTAY, createdDatePrefix)) {
@@ -78,9 +74,9 @@ public class ExitService {
         if (spot.getType() == model.enums.SpotType.RESERVED
                 && !active.isHasVipReservation()
                 && !fineRepository.existsUnpaidFine(active.getPlate(), FineReason.RESERVED_MISUSE, createdDatePrefix)) {
-            // Malaysian clamping equivalent fine: RM80
-            fineService.createFine(active.getPlate(), FineReason.RESERVED_MISUSE, 80.0, fineService.getCurrentScheme());
-            newFine += 80.0;
+            double reservedMisuseFine = 50.0;
+            fineService.createFine(active.getPlate(), FineReason.RESERVED_MISUSE, reservedMisuseFine, fineService.getCurrentScheme());
+            newFine += reservedMisuseFine;
         }
 
         newFine = MoneyUtil.round2(newFine);
@@ -126,13 +122,6 @@ public class ExitService {
             }
             String last4 = cardNumber.substring(cardNumber.length() - 4);
             maskedCard = "**** **** **** " + last4;
-        } else if (method == PaymentMethod.TOUCH_N_GO || 
-                   method == PaymentMethod.BOOST || 
-                   method == PaymentMethod.GRABPAY || 
-                   method == PaymentMethod.SHOPEEPAY || 
-                   method == PaymentMethod.ONLINE_BANKING) {
-            // eWallet/Online Banking - Store payment method name
-            maskedCard = method.name().replace("_", " ");
         } else {
             throw new IllegalArgumentException("Unsupported payment method.");
         }

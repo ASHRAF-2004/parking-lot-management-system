@@ -121,7 +121,7 @@ public class EntryExitPanel extends JPanel {
         AppTheme.styleTextField(exitPlateField);
         AppTheme.styleTextField(paymentField);
 
-        paymentField.setToolTipText("For Cash: amount given | For Card: 12-19 digits | For eWallet: auto-processed");
+        paymentField.setToolTipText("For Cash: amount given | For Card: 12-19 digits");
         paymentMethodCombo.addActionListener(e -> updatePaymentFieldHint());
 
         FocusAdapter plateNormalizer = new FocusAdapter() {
@@ -349,7 +349,6 @@ public class EntryExitPanel extends JPanel {
                     return;
                 }
             }
-            // For eWallet and Online Banking, no additional input needed
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Please enter a valid payment value.", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -433,15 +432,6 @@ public class EntryExitPanel extends JPanel {
             case CARD:
                 paymentField.setEnabled(true);
                 paymentField.setToolTipText("Enter 12-19 digit card number");
-                break;
-            case TOUCH_N_GO:
-            case BOOST:
-            case GRABPAY:
-            case SHOPEEPAY:
-            case ONLINE_BANKING:
-                paymentField.setEnabled(false);
-                paymentField.setText("Auto-processed");
-                paymentField.setToolTipText("Payment will be processed via " + selected.name().replace("_", " "));
                 break;
         }
     }
